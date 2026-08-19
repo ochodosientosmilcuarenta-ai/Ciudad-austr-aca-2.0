@@ -357,56 +357,79 @@ func _update_coins() -> void:
 		var coin := coin_nodes[i]
 		coin.position.y = 1.1 + sin(elapsed * 2.0 + float(i)) * 0.18
 
+func _interface_style(color: Color, border_color: Color, border_width := 0, radius := 0) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.border_color = border_color
+	style.set_border_width_all(border_width)
+	style.set_corner_radius_all(radius)
+	style.content_margin_left = 12.0
+	style.content_margin_right = 12.0
+	return style
+
 func _build_interface() -> void:
 	var layer := CanvasLayer.new()
 	add_child(layer)
-	var panel := ColorRect.new()
-	panel.position = Vector2(26, 24)
-	panel.size = Vector2(360, 250)
-	panel.color = Color(0.08, 0.12, 0.14, 0.88)
+	var panel := Panel.new()
+	panel.position = Vector2(28, 28)
+	panel.size = Vector2(388, 272)
+	panel.add_theme_stylebox_override("panel", _interface_style(Color(0.055, 0.08, 0.09, 0.92), Color(0.97, 0.85, 0.61, 0.42), 1, 4))
 	layer.add_child(panel)
 	var title := Label.new()
-	title.text = "CIUDAD AUSTRACA"
-	title.position = Vector2(22, 18)
-	title.add_theme_font_size_override("font_size", 22)
+	title.text = "CIUDAD AUSTRACA  /  01"
+	title.position = Vector2(24, 18)
+	title.add_theme_font_size_override("font_size", 20)
 	title.add_theme_color_override("font_color", Color("#f7d99b"))
 	panel.add_child(title)
+	var divider := ColorRect.new()
+	divider.position = Vector2(24, 51)
+	divider.size = Vector2(340, 1)
+	divider.color = Color(0.97, 0.85, 0.61, 0.28)
+	panel.add_child(divider)
 	status_label = Label.new()
-	status_label.position = Vector2(22, 54)
+	status_label.position = Vector2(24, 66)
 	status_label.add_theme_color_override("font_color", Color("#c5d8c2"))
 	panel.add_child(status_label)
 	activity_label = Label.new()
-	activity_label.position = Vector2(22, 78)
+	activity_label.position = Vector2(24, 101)
 	panel.add_child(activity_label)
 	prosperity_label = Label.new()
-	prosperity_label.position = Vector2(22, 102)
+	prosperity_label.position = Vector2(24, 127)
 	panel.add_child(prosperity_label)
 	growth_label = Label.new()
-	growth_label.position = Vector2(22, 128)
+	growth_label.position = Vector2(24, 156)
 	growth_label.text = "EL MERCADO DECIDE"
 	growth_label.add_theme_color_override("font_color", Color("#e7a653"))
 	panel.add_child(growth_label)
 	speed_label = Label.new()
-	speed_label.position = Vector2(22, 198)
+	speed_label.position = Vector2(24, 224)
 	speed_label.add_theme_color_override("font_color", Color("#f7d99b"))
 	panel.add_child(speed_label)
 	var button := Button.new()
-	button.text = "PAUSAR / CONTINUAR"
-	button.position = Vector2(22, 158)
-	button.size = Vector2(132, 30)
+	button.text = "PAUSAR  /  CONTINUAR"
+	button.position = Vector2(24, 184)
+	button.size = Vector2(170, 30)
+	button.add_theme_font_size_override("font_size", 11)
+	button.add_theme_stylebox_override("normal", _interface_style(Color("#243536"), Color("#86aa8c"), 1, 2))
+	button.add_theme_stylebox_override("hover", _interface_style(Color("#355047"), Color("#f7d99b"), 1, 2))
+	button.add_theme_stylebox_override("pressed", _interface_style(Color("#e7a653"), Color("#f7d99b"), 1, 2))
 	button.pressed.connect(_toggle_pause)
 	panel.add_child(button)
 	var speed_names := ["LENTA", "NORMAL", "RAPIDA"]
 	for i in range(speed_names.size()):
 		var speed_button := Button.new()
 		speed_button.text = speed_names[i]
-		speed_button.position = Vector2(164 + i * 64, 194)
-		speed_button.size = Vector2(60, 30)
+		speed_button.position = Vector2(204 + i * 58, 224)
+		speed_button.size = Vector2(54, 30)
+		speed_button.add_theme_font_size_override("font_size", 10)
+		speed_button.add_theme_stylebox_override("normal", _interface_style(Color("#182526"), Color("#52705f"), 1, 2))
+		speed_button.add_theme_stylebox_override("hover", _interface_style(Color("#355047"), Color("#f7d99b"), 1, 2))
+		speed_button.add_theme_stylebox_override("pressed", _interface_style(Color("#e7a653"), Color("#f7d99b"), 1, 2))
 		speed_button.pressed.connect(_set_speed.bind(i))
 		panel.add_child(speed_button)
 	progress_bar = ProgressBar.new()
-	progress_bar.position = Vector2(22, 235)
-	progress_bar.size = Vector2(316, 8)
+	progress_bar.position = Vector2(24, 262)
+	progress_bar.size = Vector2(340, 8)
 	progress_bar.show_percentage = false
 	panel.add_child(progress_bar)
 	_update_interface()
