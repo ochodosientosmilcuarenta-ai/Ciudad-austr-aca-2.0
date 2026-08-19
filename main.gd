@@ -102,20 +102,20 @@ func _material(color: Color, roughness := 0.9) -> StandardMaterial3D:
 	material.roughness = roughness
 	return material
 
-func _mesh(parent: Node3D, mesh: Mesh, material: Material, at: Vector3, scale := Vector3.ONE) -> MeshInstance3D:
+func _mesh(parent: Node3D, mesh: Mesh, material: Material, at: Vector3, mesh_scale := Vector3.ONE) -> MeshInstance3D:
 	var instance := MeshInstance3D.new()
 	instance.mesh = mesh
 	instance.material_override = material
 	instance.position = at
-	instance.scale = scale
+	instance.scale = mesh_scale
 	parent.add_child(instance)
 	return instance
 
-func _box(parent: Node3D, size: Vector3, material: Material, at: Vector3, rotation := Vector3.ZERO) -> MeshInstance3D:
+func _box(parent: Node3D, size: Vector3, material: Material, at: Vector3, mesh_rotation := Vector3.ZERO) -> MeshInstance3D:
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	var instance := _mesh(parent, mesh, material, at)
-	instance.rotation = rotation
+	instance.rotation = mesh_rotation
 	return instance
 
 func _build_landscape() -> void:
@@ -192,14 +192,14 @@ func _spawn_coin(at: Vector3) -> void:
 	coin_mesh.radial_segments = 12
 	_mesh(coin, coin_mesh, _material(gold, 0.28), Vector3.ZERO)
 	coin.rotation_degrees = Vector3(0, 0, 22)
-	var sign := Label3D.new()
-	sign.text = "$"
-	sign.font_size = 42
-	sign.outline_size = 8
-	sign.modulate = Color("#fff0b0")
-	sign.position = Vector3(0, 0.28, 0)
-	sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	coin.add_child(sign)
+	var coin_sign := Label3D.new()
+	coin_sign.text = "$"
+	coin_sign.font_size = 42
+	coin_sign.outline_size = 8
+	coin_sign.modulate = Color("#fff0b0")
+	coin_sign.position = Vector3(0, 0.28, 0)
+	coin_sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	coin.add_child(coin_sign)
 	coin_nodes.append(coin)
 
 func _trigger_order_chain() -> void:
@@ -316,20 +316,20 @@ func _create_building(at: Vector3, shop: bool, upper_order := false) -> void:
 	roof.radial_segments = 4
 	_mesh(building, roof, _material(Color("#4a3a3a") if upper_order else Color("#59423c")), Vector3(0, height + roof.height / 2.0, 0), Vector3(1.0, 1.0, 0.78))
 	if upper_order:
-		for floor in range(2):
+		for floor_idx in range(2):
 			for window in range(3):
-				_box(building, Vector3(0.28, 0.32, 0.04), _material(Color("#ffe08c"), 0.3), Vector3(-0.62 + window * 0.62, 0.72 + floor * 0.68, facade_z - 0.05))
+				_box(building, Vector3(0.28, 0.32, 0.04), _material(Color("#ffe08c"), 0.3), Vector3(-0.62 + window * 0.62, 0.72 + floor_idx * 0.68, facade_z - 0.05))
 		for stripe in range(7):
 			_box(building, Vector3(0.3, 0.1, 0.72), _material(cream if stripe % 2 == 0 else Color("#d65c4b")), Vector3(-0.9 + stripe * 0.3, height * 0.62, facade_z - 0.12), Vector3(0, 0, deg_to_rad(-8)))
 		_box(building, Vector3(width * 0.76, 0.1, 0.08), _material(wood_dark), Vector3(0, height * 0.62 - 0.08, facade_z - 0.08))
-		var sign := Label3D.new()
-		sign.text = "BANCO" if building_count % 3 == 0 else ("FABRICA" if building_count % 3 == 1 else "MAYORISTA")
-		sign.font_size = 28
-		sign.outline_size = 6
-		sign.modulate = Color("#ffe8a3")
-		sign.position = Vector3(0, height * 0.92, facade_z - 0.08)
-		sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		building.add_child(sign)
+		var label_sign := Label3D.new()
+		label_sign.text = "BANCO" if building_count % 3 == 0 else ("FABRICA" if building_count % 3 == 1 else "MAYORISTA")
+		label_sign.font_size = 28
+		label_sign.outline_size = 6
+		label_sign.modulate = Color("#ffe8a3")
+		label_sign.position = Vector3(0, height * 0.92, facade_z - 0.08)
+		label_sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		building.add_child(label_sign)
 	elif shop:
 		for stripe in range(5):
 			_box(building, Vector3(0.3, 0.08, 0.55), _material(cream if stripe % 2 == 0 else Color("#d65c4b")), Vector3(-0.6 + stripe * 0.3, height * 0.68, facade_z - 0.06), Vector3(0, 0, deg_to_rad(-8)))
@@ -417,8 +417,8 @@ func _update_interface() -> void:
 	status_label.text = "CADENA DE PROSPERIDAD  •  +90%" if chain_triggered else "Orden espontaneo  •  sin alcaldia"
 	activity_label.text = "ACTIVIDAD ECONOMICA     %02d" % activity
 	prosperity_label.text = "PROSPERIDAD             %02d" % prosperity
-	var speed_name := ["LENTA", "NORMAL", "RAPIDA"][speed_mode]
-	speed_label.text = "RITMO DE CRECIMIENTO: %s" % speed_name
+	var speed_name: Array[String] = ["LENTA", "NORMAL", "RAPIDA"]
+	speed_label.text = "RITMO DE CRECIMIENTO: %s" % speed_name[speed_mode]
 	growth_label.text = "EMPRESAS SUPERIORES ACTIVAS" if chain_triggered else "EL MERCADO DECIDE"
 	progress_bar.value = float(building_count) / float(BUILDING_LIMIT) * 100.0
 
